@@ -1,0 +1,58 @@
+# meshcom-bbs - przykladowa konfiguracja
+
+[bbs]
+call = "SP2XYZ-1"          # znak, na ktory uzytkownicy wysylaja DM = znak Twojego noda (zalecane)
+db = "mcbbs.sqlite3"
+
+# Komendy dzialaja BEZ prefiksu (np. samo "l"). Opcjonalnie mozna je poprzedzic slowem z tej listy
+# albo znakiem BBS (np. "bbs l"). Przy wspoldzielonym nodzie, na ktorym rozmawiaja tez ludzie,
+# mozna wymusic prefiks:
+prefixes = ["!"]
+require_prefix = false
+
+retention_bulletin_hours = 720   # jak dlugo trzymac wpisy tablicy (30 dni)
+retention_private_hours = 168    # jak dlugo trzymac poczte prywatna, takze nieprzeczytana (7 dni)
+max_private = 5             # max wiadomosci w skrzynce uzytkownika
+frame_bytes = 147           # max bajtow tekstu w ramce (zmierzone: 160 - 2 - dlugosc znaku adresata; 147 dziala dla kazdego)
+pace_s = 6                  # min. odstep miedzy ramkami nadawanymi przez BBS (airtime, duty cycle)
+ack_timeout_s = 90
+reply_attempts = 3
+retry_delays_s = [60, 300, 1800]
+notify_interval_h = 8       # co ile przypominac o nieprzeczytanej poczcie
+notify_all_ssids = true      # powiadomienie na wszystkie SSID uzytkownika widziane w ostatnich dniach
+notify_addr_days = 7
+notify_max_addrs = 3
+draft_autosave_s = 180      # cisza w trybie pisania (brak END) -> zapisz to, co jest, i powiadom
+
+# Czy BBS sam wysyla :ackNN na przychodzace DM. Domyslnie auto: firmware sam potwierdza DM
+# adresowane do wlasnego znaku noda (BBS pod znakiem noda -> false), a BBS na innym SSID musi
+# potwierdzac sam (-> true, tylko KISS). Ustawiaj reczne true/false tylko do eksperymentow.
+# ack_incoming = false
+
+[transport]
+type = "udp"
+host = "192.168.1.10"      # IP noda; na nodzie: --extudp on, --extudpip <IP_tego_hosta>
+port = 1799               # opcjonalny (domyslnie 1799): ten sam port do wysylania i nasluchu
+ack_statuses = [2]        # w logach widzielismy tylko status 2 w ramce {"type":"ack"}
+
+#type = "kiss"               # "kiss" albo "udp"
+#host = "192.168.1.10"        # IP noda
+#port = 8001                 # KISS: BBS laczy sie DO noda (na nodzie: --kiss on, --kiss tx on)
+
+
+# --- Bramka JS8Call (KF) -> BBS, etap 1: tylko odbior, BBS niczego nie nadaje na KF ---------------
+# W JS8Call wlacz serwer API: Settings -> Reporting -> Network Message API (port zwykle 2442 (TCP);
+# dokumentacja JS8Call-improved podaje tez 2242 - sprawdz u siebie).
+# Format w JS8Call: "@GRM Tytul : Tresc", "@EMC Tytul : Tresc", "@EMC26024 Tytul : Tresc", "@PM ZNAK Tytul : Tresc"
+# [js8call]
+# host = "127.0.0.1"          # komputer z JS8Call
+# port = 2442
+# groups = ["@GRM"]           # tablica ogloszen (bl), wpisy ZNAK@JS8
+# urgent = ["@EMC"]           # EmCom: wpis PILNY (!), temat z przedrostkiem "EMC:"
+# private = ["@PM"]           # poczta prywatna: "@PM ZNAK_BBS Tytul : Tresc"
+# urgent_send = false         # true = EMC dodatkowo nadawane na grupe MeshCom (bez ACK); uwaga: KF nie uwierzytelnia nadawcy
+# urgent_group = 9            # grupa MeshCom dla zwyklego @EMC (max 5 cyfr); 9 = lokalnie przez radio, bez Internetu
+# urgent_groups = [26024]     # dozwolone grupy dla @EMCxxxxx (ida przez brame do calej sieci); spoza listy = ignorowane
+# urgent_repeat = 1           # ile razy nadac (kopie co 2 min)
+# urgent_max_per_hour = 6     # ochrona LoRa: najwyzej tyle wysylek EMC na godzine (wpis zostaje na tablicy)
+# urgent_dm = false           # true = DM do osob z "urgent on" (tylko male instalacje)

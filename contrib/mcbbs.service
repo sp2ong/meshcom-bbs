@@ -1,0 +1,14 @@
+[Unit]
+Description=meshcom-bbs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/meshcom-bbs
+ExecStart=/usr/bin/python3 -m mcbbs -c /home/pi/meshcom-bbs/config.toml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

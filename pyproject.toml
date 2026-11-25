@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meshcom-bbs"
+version = "0.5.0"
+description = "BBS (Bulletin Board System) dla sieci MeshCom - szkielet"
+requires-python = ">=3.11"
+license = {text = "GPL-3.0-or-later"}
+dependencies = []
+
+[project.scripts]
+mcbbs = "mcbbs.__main__:main"
+
+[tool.setuptools]
+packages = ["mcbbs", "mcbbs.transports", "mcbbs.gateways"]
